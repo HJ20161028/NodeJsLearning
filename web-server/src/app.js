@@ -58,7 +58,25 @@ app.get('/help', (req, res) => {
     msg: 'If you have any questions, please contact me by email: Jin.He@perkinelmer.com',
     name: 'Mr Wang'
   })
-})
+});
+
+app.get('/help/*', (req, res) => {
+  // res.send('Help child page not found.');
+  res.render('notFound', {
+    title: '404 not found page',
+    errorMsg: 'Help article not found.',
+    name: 'Jin'
+  });
+});
+
+app.get('*', (req, res) => {
+  // res.send('My 404 page.');
+  res.render('notFound', {
+    title: '404 not found page',
+    errorMsg: 'Page not found.',
+    name: 'Jin'
+  });
+});
 
 app.listen(3000, () => {
   console.log('Server is up on port 3000.');

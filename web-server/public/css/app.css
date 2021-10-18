@@ -1,3 +1,27 @@
 h1 {
   color: #666;
+  font-size: 60px;
+}
+
+body{
+  margin: 20px auto;
+  width: 1000px;
+}
+
+.header{
+  margin-bottom: 48px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.header a{
+  color: #888;
+  margin-right: 10px;
+  text-decoration: none;
+}
+
+.footer{
+  border-top: 1px solid #d9d9d9;
+  margin-top: 16px;
+  padding: 16px 0;
 }
