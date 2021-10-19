@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require('express');
 const hbs = require('hbs');
+const { getWeatherByLocation } = require('./utils/weatherService');
 
 const app = express();
 // Define paths for Express config;
@@ -33,9 +34,25 @@ app.use(express.static(publicDirectoryPath));
 //   }]);
 // });
 
-// app.get('/weather', (req, res) => {
-//   res.send('Weather page.');
-// });
+app.get('/weather', (req, res) => {
+  if (!req.query.address) {
+    return res.send({
+      error: 'You must provide an address term.'
+    });
+  }
+  // return res.send({
+  //   forecast: 'It is raining',
+  //   location: 'Shanghai',
+  //   address: req.query.address,
+  // });
+  // use weather api to get forecast;
+  getWeatherByLocation(req.query.address, (error, data) => {
+    if (error) {
+      return res.send({ error });
+    }
+    return res.send(data);
+  })
+});
 
 // use hbs template instead.
 app.get('', (req, res) => {
@@ -66,6 +83,17 @@ app.get('/help/*', (req, res) => {
     title: '404 not found page',
     errorMsg: 'Help article not found.',
     name: 'Jin'
+  });
+});
+
+app.get('/products', (req, res) => {
+  if (!req.query.search) {
+    return res.send({
+      error: "You must provide a search term."
+    })
+  }
+  res.send({
+    products: [],
   });
 });
 
