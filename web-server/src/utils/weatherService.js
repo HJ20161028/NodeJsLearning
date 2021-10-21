@@ -10,12 +10,13 @@ const getWeatherByLocation = (location, callback) => {
       callback(body.error.info, undefined);
     }
     else {
-      callback('', {
-        latitude: body.location.lat,
-        longitude: body.location.lon,
-        location: body.location.name,
-      })
-    }
+      // callback('', {
+      //   latitude: body.location.lat,
+      //   longitude: body.location.lon,
+      //   location: body.location.name,
+      // })
+      callback('', body);
+    } 
   });
 }
 

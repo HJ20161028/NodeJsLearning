@@ -9,6 +9,11 @@
 <body>
   {{>header}}
   <p>Get Weather Info. by this page.</p>
+  <form action="" class="weather-form">
+    <input type="text" class="location-input" placeholder="Location" />
+    <button id="search-btn" type="submit">Search</button>
+    <p id="message"></p>
+  </form>
   {{>footer}}
   <script type="text/javascript" src='/js/app.js'></script>
 </body>
