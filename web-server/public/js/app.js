@@ -8,7 +8,7 @@
 //   }
 // });
 
-// fetch('http://localhost:3000/weather?address=boston').then((resp) => {
+// fetch('/weather?address=boston').then((resp) => {
 //   if (resp.ok) {
 //     resp.json().then((data) => {
 //       console.log(data);
@@ -22,7 +22,7 @@ function queryWeather(callback) {
   const oMessage = document.querySelector('#message');
   weatherForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const url = 'http://localhost:3000/weather?address=' + locationInput.value;
+    const url = '/weather?address=' + locationInput.value;
     oMessage.textContent = 'Fetching Data...';
     fetch(url).then((resp) => {
       if (resp.ok) {
