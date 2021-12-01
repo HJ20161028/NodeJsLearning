@@ -87,4 +87,50 @@ async function run() {
     await client.close();
   }
 }
-run().catch(console.dir);
+// run().catch(console.dir);
+
+async function updateUserById(id) {
+  try {
+    await client.connect();
+    const database = client.db(databaseName);
+    const users = database.collection('users');
+    const result = await users.updateOne({ _id: ObjectId(id) }, {
+      $set: { name: 'HJ' }
+    });
+    console.log(result);
+  } finally {
+    await client.close();
+  }
+}
+
+// updateUserById('61a4d0e967b6956f8d1c9fe5');
+// update many practice;
+async function completeTasks() {
+  try {
+    await client.connect();
+    const database = client.db(databaseName);
+    const tasks = database.collection('tasks');
+    const result = await tasks.updateMany({ completed: false }, {
+      $set: { completed: true }
+    });
+    console.log(result);
+  } finally {
+    await client.close();
+  }
+}
+
+// completeTasks();
+async function deleteUser(query) {
+  try {
+    await client.connect();
+    const db = client.db(databaseName);
+    const users = db.collection('users');
+    const result = await users.deleteMany(query);
+    console.log(result); 
+  } finally {
+    await client.close();
+  }
+}
+
+// deleteUser({ name: 'Jin' });
+deleteUser({ name: 'Jen' });
