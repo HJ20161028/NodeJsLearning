@@ -11,9 +11,21 @@ const { Task } = require('../models/tasks');
 // });
 
 // count function;
-// Task.count({ completed: false }, (e, count) => {
-//   console.log(count);
+// Task.count({ completed: false }).then((resp) => {
+//   console.log(resp);
 // });
-Task.count({ completed: false }).then((resp) => {
-  console.log(resp);
-});
+
+// use async/await, 61acc0b6957ef80b68249660;
+const removeAndCount = async(id) => {
+  try {
+    await Task.findByIdAndRemove(id);
+    const count = await Task.count({ completed: false });
+    return count;
+  } catch(e) {
+    console.log(e);
+  }
+}
+
+removeAndCount('61acc0b6957ef80b68249660').then((count) => {
+  console.log(count);
+})
