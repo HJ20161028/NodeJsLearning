@@ -56,5 +56,6 @@ function createUser(user, successCallback, errorCallback) {
 }
 
 module.exports = {
+  User,
   createUser,
 }

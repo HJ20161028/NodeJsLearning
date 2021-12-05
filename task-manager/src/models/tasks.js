@@ -26,5 +26,6 @@ function createTask(task, successCallback, errorCallback) {
 }
 
 module.exports = {
+  Task,
   createTask,
 }
