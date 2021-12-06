@@ -55,7 +55,36 @@ function createUser(user, successCallback, errorCallback) {
   });
 }
 
+// use async function;
+async function getUsers(query, successCallback, errorCallback) {
+  try {
+    const users = await User.find(query);
+    if (successCallback) {
+      successCallback(users);
+    }
+  } catch(e) {
+    if (errorCallback) {
+      errorCallback(e);
+    }
+  };
+}
+
+async function updateUserById(id, updatingProps, successCallback, errorCallback) {
+  try {
+    const user = await User.findByIdAndUpdate(id, updatingProps, { new: true, runValidators: true });
+    if (successCallback) {
+      successCallback(user);
+    }
+  } catch(e) {
+    if (errorCallback) {
+      errorCallback(e);
+    }
+  }
+}
+
 module.exports = {
   User,
   createUser,
+  getUsers,
+  updateUserById,
 }

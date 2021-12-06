@@ -1,7 +1,8 @@
 const express = require('express');
 require('./db/mongoose');
-const { User, createUser } = require('./models/users');
-const { Task, createTask } = require('./models/tasks');
+const { User, createUser, getUsers, updateUserById } = require('./models/users');
+const { Task, createTask, getTasks, getTaskById } = require('./models/tasks');
+const { ObjectId } = require('bson');
 
 const app = express();
 
@@ -26,10 +27,15 @@ app.post('/tasks', (req, res) => {
 });
 
 app.get('/users', (req, res) => {
-  User.find({}).then((resp) => {
-    res.send(resp);
-  }).catch((e) => {
-    res.send(e);
+  // User.find({}).then((resp) => {
+  //   res.send(resp);
+  // }).catch((e) => {
+  //   res.send(e);
+  // });
+  getUsers({}, (users) => {
+    res.send(users);
+  }, (e) => {
+    res.status(500).send(e);
   });
 });
 
@@ -47,23 +53,54 @@ app.get('/users/:id', (req, res) => {
 
 // get all tasks/task:id;
 app.get('/tasks', (req, res) => {
-  Task.find({}).then((tasks) => {
+  // Task.find({}).then((tasks) => {
+  //   res.send(tasks);
+  // }).catch(() => {
+  //   res.status(500).send();
+  // });
+  getTasks({}, (tasks) => {
     res.send(tasks);
-  }).catch(() => {
+  }, (e) => {
     res.status(500).send();
-  });
+  })
 });
 
 app.get('/tasks/:id', (req, res) => {
   const _id = req.params.id;
-  Task.findById(_id).then((task) => {
+  // Task.findById(_id).then((task) => {
+  //   if (!task) {
+  //     return res.status(404).send();
+  //   }
+  //   res.send(task);
+  // }).catch(() => {
+  //   res.status(500).send();
+  // });
+  getTaskById(_id, (task) => {
     if (!task) {
       return res.status(404).send();
     }
     res.send(task);
-  }).catch(() => {
+  }, (e) => {
     res.status(500).send();
   });
+});
+
+// update user by Id;
+app.patch('/users/:id', (req, res) => {
+  const _id = req.params.id;
+  const updating = Object.keys(req.body);
+  const allowUpdates = ["name", "age", "email", "password"];
+  const isValidUpdate = updating.every((key) => allowUpdates.includes(key));
+
+  if (!isValidUpdate) {
+    return res.status(400).send("Error: Invalid updating props. Just allow updating 'name,age,email,password'.");
+  }
+
+  updateUserById(_id, req.body, (user) => {
+    res.send(user);
+  }, (e) => {
+    res.status(500).send(e);
+  })
 });
 
 app.listen(port, () => {
