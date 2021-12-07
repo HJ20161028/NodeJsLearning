@@ -82,9 +82,23 @@ async function updateUserById(id, updatingProps, successCallback, errorCallback)
   }
 }
 
+async function removeUserById(id, successCallback, errorCallback) {
+  try {
+    const user = await User.findByIdAndRemove(id);
+    if (successCallback) {
+      successCallback(user);
+    }
+  } catch(e) {
+    if (errorCallback) {
+      errorCallback(e);
+    }
+  }
+}
+
 module.exports = {
   User,
   createUser,
   getUsers,
   updateUserById,
+  removeUserById,
 }

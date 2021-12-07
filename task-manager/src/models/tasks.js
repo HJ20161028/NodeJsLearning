@@ -61,9 +61,37 @@ async function getTaskById(id, successCallback, errorCallback) {
   }
 }
 
+async function updateTaskById(id, updatingProps, successCallback, errorCallback) {
+  try {
+    const user = await Task.findByIdAndUpdate(id, updatingProps, { new: true, runValidators: true });
+    if (successCallback) {
+      successCallback(user);
+    }
+  } catch(e) {
+    if (errorCallback) {
+      errorCallback(e);
+    }
+  }
+}
+
+async function removeTaskById(id, successCallback, errorCallback) {
+  try {
+    const task = await Task.findByIdAndRemove(id);
+    if (successCallback) {
+      successCallback(task);
+    }
+  } catch(e) {
+    if (errorCallback) {
+      errorCallback(e);
+    }
+  }
+}
+
 module.exports = {
   Task,
   createTask,
   getTasks,
   getTaskById,
+  updateTaskById,
+  removeTaskById,
 }
