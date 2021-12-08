@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
-const User = mongoose.model('User', {
+const userSchema = mongoose.Schema({
   name: {
     type: String,
     trim: true,
@@ -38,6 +39,17 @@ const User = mongoose.model('User', {
   }
 });
 
+userSchema.pre('save', async function(next) {
+  const user = this;
+  // encode password;
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(user.password, 8);
+  }
+  next();
+});
+
+const User = mongoose.model('User', userSchema);
+
 function createUser(user, successCallback, errorCallback) {
   const newUser = new User(user);
   newUser.save().then(() => {
@@ -71,7 +83,10 @@ async function getUsers(query, successCallback, errorCallback) {
 
 async function updateUserById(id, updatingProps, successCallback, errorCallback) {
   try {
-    const user = await User.findByIdAndUpdate(id, updatingProps, { new: true, runValidators: true });
+    const user = await User.findById(id);
+    Object.assign(user, updatingProps);
+    await user.save();
+    // const user = await User.findByIdAndUpdate(id, updatingProps, { new: true, runValidators: true });
     if (successCallback) {
       successCallback(user);
     }

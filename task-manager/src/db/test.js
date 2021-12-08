@@ -1,5 +1,6 @@
 require('./mongoose');
 const { Task } = require('../models/tasks');
+const bcrypt = require('bcryptjs');
 
 // remove 'read' task and count incomplete tasks;
 // Task.findByIdAndRemove('61a8c11dd125102d4029cf06').then(() => {
@@ -29,3 +30,15 @@ const removeAndCount = async(id) => {
 removeAndCount('61acc0b6957ef80b68249660').then((count) => {
   console.log(count);
 })
+
+// bcrypt: encode password one way(can't be decode);
+const bcryptTest = async() => {
+  const password = 'test123!';
+  const hashedPassword = await bcrypt.hash(password, 8);
+  console.log('password:', password);
+  console.log('hashed password:', hashedPassword);
+  const isMatch = await bcrypt.compare(password, hashedPassword);
+  console.log('isMatch:', isMatch);
+}
+
+bcryptTest();

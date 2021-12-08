@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const Task = mongoose.model('Task', {
+const taskSchema = mongoose.Schema({
   description: {
     type: String,
     trim: true,
@@ -11,6 +11,14 @@ const Task = mongoose.model('Task', {
     default: false,
   },
 });
+
+taskSchema.pre('save', function(next) {
+  const task = this;
+  console.log('Just before task save.');
+  next();
+});
+
+const Task = mongoose.model('Task', taskSchema);
 
 async function createTask(task, successCallback, errorCallback) {
   const newTask = new Task(task);
@@ -63,9 +71,12 @@ async function getTaskById(id, successCallback, errorCallback) {
 
 async function updateTaskById(id, updatingProps, successCallback, errorCallback) {
   try {
-    const user = await Task.findByIdAndUpdate(id, updatingProps, { new: true, runValidators: true });
+    // const task = await Task.findByIdAndUpdate(id, updatingProps, { new: true, runValidators: true });
+    const task = await Task.findById(id);
+    Object.assign(task, updatingProps);
+    await task.save();
     if (successCallback) {
-      successCallback(user);
+      successCallback(task);
     }
   } catch(e) {
     if (errorCallback) {
