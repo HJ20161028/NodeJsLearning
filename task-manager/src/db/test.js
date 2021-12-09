@@ -1,6 +1,7 @@
 require('./mongoose');
 const { Task } = require('../models/tasks');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 // remove 'read' task and count incomplete tasks;
 // Task.findByIdAndRemove('61a8c11dd125102d4029cf06').then(() => {
@@ -27,9 +28,9 @@ const removeAndCount = async(id) => {
   }
 }
 
-removeAndCount('61acc0b6957ef80b68249660').then((count) => {
-  console.log(count);
-})
+// removeAndCount('61acc0b6957ef80b68249660').then((count) => {
+//   console.log(count);
+// })
 
 // bcrypt: encode password one way(can't be decode);
 const bcryptTest = async() => {
@@ -41,4 +42,12 @@ const bcryptTest = async() => {
   console.log('isMatch:', isMatch);
 }
 
-bcryptTest();
+// bcryptTest();
+const jwtTest = () => {
+  const token = jwt.sign({ id: 'test123' }, 'secret123');
+  console.log(token);
+  const data = jwt.verify(token, 'secret123');
+  console.log(data);
+}
+
+jwtTest();
