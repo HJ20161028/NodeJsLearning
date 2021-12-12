@@ -7,6 +7,12 @@ const app = express();
 
 const port = process.env.PORT || '3000';
 
+// middleware function;
+
+// app.use((req, res, next) => {
+//   res.status(503).send('Website is upgarding...')
+// })
+
 app.use(express.json());
 app.use(userRouter);
 app.use(taskRouter);

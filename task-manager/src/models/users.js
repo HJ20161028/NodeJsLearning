@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { MyTokenSecret } = require('./enumType');
 
 const userSchema = mongoose.Schema({
   name: {
@@ -37,8 +39,24 @@ const userSchema = mongoose.Schema({
         throw new Error('Password should not contain words like password');
       }
     }
-  }
+  },
+  tokens: [
+    {
+      token: {
+        type: String,
+        required: true,
+      }
+    }
+  ]
 });
+
+userSchema.methods.generateAuthToken = async function () {
+  const user = this;
+  const token = jwt.sign({ _id: user._id.toString() }, MyTokenSecret);
+  user.tokens = user.tokens.concat({ token });
+  await user.save();
+  return token;
+}
 
 userSchema.statics.findByCredentials = async(email, password) => {
   const user = await User.findOne({ email });
@@ -63,21 +81,9 @@ userSchema.pre('save', async function(next) {
 
 const User = mongoose.model('User', userSchema);
 
-function createUser(user, successCallback, errorCallback) {
+function createUser(user) {
   const newUser = new User(user);
-  newUser.save().then(() => {
-    if (successCallback) {
-      successCallback(newUser);
-    } else {
-      console.log('New user created successful:' + newUser );
-    }
-  }).catch((e) => {
-    if (errorCallback) {
-      errorCallback(e);
-    } else {
-      console.log(e);
-    }
-  });
+  return newUser.save();
 }
 
 // use async function;

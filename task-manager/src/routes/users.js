@@ -1,5 +1,6 @@
 const express = require('express');
 const { User, createUser, getUsers, updateUserById, removeUserById } = require('../models/users');
+const auth = require('../middleware/auth');
 
 const router = new express.Router();
 
@@ -7,20 +8,8 @@ router.get('/test', (req, res) => {
   res.send('From user route.')
 });
 
-router.post('/users', (req, res) => {
-  createUser(req.body, (newUser) => {
-    res.send(newUser);
-  }, (e) => {
-    res.status(400).send(e);
-  });
-});
-
-router.get('/users', (req, res) => {
-  getUsers({}, (users) => {
-    res.send(users);
-  }, (e) => {
-    res.status(500).send(e);
-  });
+router.get('/users/me', auth, (req, res) => {
+  res.send(req.user);
 });
 
 router.get('/users/:id', (req, res) => {
@@ -33,6 +22,16 @@ router.get('/users/:id', (req, res) => {
   }).catch((e) => {
     res.status(500).send(e);
   });
+});
+
+router.post('/users', async (req, res) => {
+  try {
+    const newUser = await createUser(req.body);
+    const token = await newUser.generateAuthToken();
+    res.send({ user: newUser, token });
+  } catch(e) {
+    res.status(400).send(e);
+  }
 });
 
 // update user by Id;
@@ -70,7 +69,8 @@ router.delete('/users/:id', (req, res) => {
 router.post('/users/login', async (req, res) => {
   try {
     const user = await User.findByCredentials(req.body.email, req.body.password);
-    res.send(user);
+    const token = await user.generateAuthToken();
+    res.send({ user, token });
   } catch(e) {
     res.status(400).send(e);
   }
