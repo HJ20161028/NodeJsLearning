@@ -34,35 +34,46 @@ router.post('/users', async (req, res) => {
   }
 });
 
-// update user by Id;
-router.patch('/users/:id', (req, res) => {
-  const _id = req.params.id;
-  const updating = Object.keys(req.body);
-  const allowUpdates = ["name", "age", "email", "password"];
-  const isValidUpdate = updating.every((key) => allowUpdates.includes(key));
+// update my profile if auth successful;
+router.patch('/users/me', auth, async (req, res) => {
+  // const _id = req.params.id;
+  // const updating = Object.keys(req.body);
+  // const allowUpdates = ["name", "age", "email", "password"];
+  // const isValidUpdate = updating.every((key) => allowUpdates.includes(key));
 
-  if (!isValidUpdate) {
-    return res.status(400).send("Error: Invalid updating props. Just allow updating 'name,age,email,password'.");
-  }
+  // if (!isValidUpdate) {
+  //   return res.status(400).send("Error: Invalid updating props. Just allow updating 'name,age,email,password'.");
+  // }
 
-  updateUserById(_id, req.body, (user) => {
-    res.send(user);
-  }, (e) => {
+  // updateUserById(_id, req.body, (user) => {
+  //   res.send(user);
+  // }, (e) => {
+  //   res.status(500).send(e);
+  // })
+
+  try {
+    const updating = Object.keys(req.body);
+    const allowUpdates = ["name", "age", "email", "password"];
+    const isValidUpdate = updating.every((key) => allowUpdates.includes(key));
+    if (!isValidUpdate) {
+      return res.status(400).send("Error: Invalid updating props. Just allow updating 'name,age,email,password'.");
+    }
+    Object.assign(req.user, req.body);
+    await req.user.save();
+    res.send(req.user);
+  } catch(e) {
     res.status(500).send(e);
-  })
+  }
 });
 
-// remove user;
-router.delete('/users/:id', (req, res) => {
-  const _id = req.params.id;
-  removeUserById(_id, (user) => {
-    if (!user) {
-      return res.status(404).send();
-    }
-    res.send(user);
-  }, (e) => {
+// remove user; only delete me by auth middleware;
+router.delete('/users/me', auth, async (req, res) => {
+  try {
+    await req.user.remove();
+    res.send(req.user);
+  } catch (e) {
     res.status(500).send(e);
-  });
+  }
 });
 
 // login
