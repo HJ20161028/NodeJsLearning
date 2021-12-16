@@ -3,6 +3,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { MyTokenSecret } = require('./enumType');
+const { Task } = require('./tasks');
 
 const userSchema = mongoose.Schema({
   name: {
@@ -50,6 +51,13 @@ const userSchema = mongoose.Schema({
   ]
 });
 
+// virtual: Associate User and Task documents;
+userSchema.virtual('tasks', {
+  ref: 'Task',
+  localField: '_id',
+  foreignField: 'owner',
+});
+
 userSchema.methods.toJSON = function () {
   const user = this;
   const userObj = user.toObject();
@@ -85,6 +93,12 @@ userSchema.pre('save', async function(next) {
     user.password = await bcrypt.hash(user.password, 8);
   }
   next();
+});
+
+// when user removed, all user's tasks should be cascade removed also;
+userSchema.post('remove', async function () {
+  const user = this;
+  await Task.deleteMany({ owner: user._id });
 });
 
 const User = mongoose.model('User', userSchema);

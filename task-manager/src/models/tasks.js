@@ -10,6 +10,11 @@ const taskSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'User',
+  }
 });
 
 taskSchema.pre('save', function(next) {
@@ -56,9 +61,9 @@ async function getTasks(query, successCallback, errorCallback) {
   }
 }
 
-async function getTaskById(id, successCallback, errorCallback) {
+async function getTaskById(query, successCallback, errorCallback) {
   try {
-    const task = await Task.findById(id);
+    const task = await Task.findOne(query);
     if (successCallback) {
       successCallback(task);
     }
@@ -69,10 +74,13 @@ async function getTaskById(id, successCallback, errorCallback) {
   }
 }
 
-async function updateTaskById(id, updatingProps, successCallback, errorCallback) {
+async function updateTaskById(query, updatingProps, successCallback, errorCallback) {
   try {
     // const task = await Task.findByIdAndUpdate(id, updatingProps, { new: true, runValidators: true });
-    const task = await Task.findById(id);
+    const task = await Task.findOne(query);
+    if (!task) {
+      throw new Error('Task not found');
+    }
     Object.assign(task, updatingProps);
     await task.save();
     if (successCallback) {
@@ -85,9 +93,9 @@ async function updateTaskById(id, updatingProps, successCallback, errorCallback)
   }
 }
 
-async function removeTaskById(id, successCallback, errorCallback) {
+async function removeTaskById(query, successCallback, errorCallback) {
   try {
-    const task = await Task.findByIdAndRemove(id);
+    const task = await Task.findOneAndRemove(query);
     if (successCallback) {
       successCallback(task);
     }
