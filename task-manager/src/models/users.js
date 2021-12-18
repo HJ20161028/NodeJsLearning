@@ -49,6 +49,8 @@ const userSchema = mongoose.Schema({
       }
     }
   ]
+}, {
+  timestamps: true,
 });
 
 // virtual: Associate User and Task documents;

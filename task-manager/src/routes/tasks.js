@@ -25,8 +25,31 @@ router.get('/tasks', auth, async (req, res) => {
   // })
 
   // use ref tasks instead;
+  const match = {};
+  if (req.query.completed) {
+    match.completed = req.query.completed === 'true';
+  }
+  // options for pagination and sort so on.
+  const options = {};
+  if (req.query.limit) {
+    options.limit = parseInt(req.query.limit, 10);
+    if (req.query.skip) {
+      options.skip = parseInt(req.query.skip, 10);
+    }
+  }
+  // sort function;
+  if (req.query.sortBy) {
+    const sort = req.query.sortBy.split(':');
+    options.sort = {
+      [sort[0]]: sort[1] === 'desc' ? -1 : 1, // createdAt:desc;
+    }
+  }
   try {
-    await req.user.populate('tasks').execPopulate();
+    await req.user.populate({
+      path: 'tasks',
+      match,
+      options: options,
+    }).execPopulate();
     res.send(req.user.tasks);
   } catch(e) {
     res.status(404).send();
