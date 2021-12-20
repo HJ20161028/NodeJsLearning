@@ -110,7 +110,7 @@ router.post('/users/logoutAll', auth, async (req, res) => {
 
 // upload files
 const upload = multer({
-  dest: 'avatar',
+  // dest: 'avatar',
   limits: {
     fileSize: 1000000, // 1MB
   },
@@ -122,8 +122,23 @@ const upload = multer({
     cb(undefined, true);
   }
 });
-router.post('/users/avatar', upload.single('file_name'), (req, res) => {
+router.post('/users/avatar', auth, upload.single('file_name'), async (req, res) => {
+  // save img to user.avatar, instead of avatar folder;
+  req.user.avatar = req.file.buffer;
+  await req.user.save();
   res.send();
+}, (err, req, res, next) => {
+  res.status(400).send({ error: err.message });
 });
 
+// delete avatar;
+router.delete('/users/me/avatar', auth, async (req, res) => {
+  try {
+    req.user.avatar = undefined;
+    await req.user.save();
+    res.send(req.user);
+  } catch(e) {
+    res.status(500).send(e);
+  }
+});
 module.exports = router;
